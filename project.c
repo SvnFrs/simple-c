@@ -22,6 +22,9 @@ void printMenu();
 void addStudent();
 void printMajorOptions();
 void displayStudent();
+void generateTableHead();
+void generateTableLine(int id, char *name, char *major, char *studentCode, char *dateOfBirth);
+void generateTableTail();
 
 int main() {
     do {
@@ -99,13 +102,13 @@ void addStudent() {
 
         switch (majorChoice) {
             case 1:
-                strcpy(newStudent.major, "KTPM (Ky thuat phan mem)");
+                strcpy(newStudent.major, "KTPM");
                 break;
             case 2:
-                strcpy(newStudent.major, "MS (Marketing so)");
+                strcpy(newStudent.major, "MS");
                 break;
             case 3:
-                strcpy(newStudent.major, "NNA (Ngon ngu Anh)");
+                strcpy(newStudent.major, "NNA");
                 break;
         }
 
@@ -136,16 +139,33 @@ void printMajorOptions() {
 
 
 void displayStudent() {
-    printf("\nList of students:\n");
     if (studentCount == 0) {
         printf("No students added yet.\n");
     } else {
+        printf("\nList of students:\n");
+        generateTableHead();
         for (int i = 0; i < studentCount; i++) {
-            printf("Student %d:\n", i + 1);
-            printf("Name: %s\n", studentList[i].name);
-            printf("Major: %s\n", studentList[i].major);
-            printf("Student Code: %s\n", studentList[i].studentCode);
-            printf("Date of Birth: %s\n", studentList[i].dateOfBirth);
+            // printf("Student %d:\n", i + 1);
+            // printf("Name: %s\n", studentList[i].name);
+            // printf("Major: %s\n", studentList[i].major);
+            // printf("Student Code: %s\n", studentList[i].studentCode);
+            // printf("Date of Birth: %s\n", studentList[i].dateOfBirth);
+            generateTableLine(i + 1, studentList[i].name, studentList[i].major, studentList[i].studentCode, studentList[i].dateOfBirth);
         }
+        generateTableTail();
     }
+}
+
+void generateTableHead() {
+    printf("+------+--------------------+----------------+----------------+----------------+\n");
+    printf("|  ID  | Student Name       | Major          | Student Code   | Date of Birth  |\n");
+    printf("+------+--------------------+----------------+----------------+----------------+\n");
+}
+
+void generateTableLine(int id, char *name, char *major, char *studentCode, char *dateOfBirth) {
+    printf("| %2d   | %-18s | %-14s | %-14s | %-14s |\n", id, name, major, studentCode, dateOfBirth);
+}
+
+void generateTableTail() {
+    printf("+------+--------------------+----------------+----------------+----------------+\n");
 }
