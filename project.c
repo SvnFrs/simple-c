@@ -95,5 +95,16 @@ void addStudent() {
 }
 
 void displayStudent() {
-    
+    printf("\nList of students:\n");
+    if (studentCount == 0) {
+        printf("No students added yet.\n");
+    } else {
+        for (int i = 0; i < studentCount; i++) {
+            printf("Student %d:\n", i + 1);
+            printf("Name: %s\n", studentList[i].name);
+            printf("Major: %s\n", studentList[i].major);
+            printf("Student Code: %s\n", studentList[i].studentCode);
+            printf("Date of Birth: %s\n", studentList[i].dateOfBirth);
+        }
+    }
 }
