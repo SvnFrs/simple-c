@@ -4,6 +4,7 @@
 #include <ctype.h>
 #include <math.h>
 #include <limits.h>
+#include <time.h>
 
 #define MAX_STUDENTS 100  // define the maximum number of students to avoid magic numbers
 
@@ -21,12 +22,16 @@ int input;
 void printMenu();
 void addStudent();
 void printMajorOptions();
+int isLeapYear(int year);
+int validateDateOfBirth(const char* dateOfBirth);
 void displayStudent();
 void generateTableHead();
 void generateTableLine(int id, char *name, char *major, char *studentCode, char *dateOfBirth);
 void generateTableTail();
 void searchStudent();
 void deleteStudent();
+void sortStudent();
+void printSortOptions();
 
 int main() {
     do {
@@ -46,7 +51,7 @@ int main() {
                 deleteStudent();
                 break;
             case 5:
-                printf("Sort student\n");
+                sortStudent();
                 break;
             case 6:
                 printf("Change the list of student\n");
@@ -116,8 +121,17 @@ void addStudent() {
 
         printf("Enter student code: ");
         scanf("%s", newStudent.studentCode);
-        printf("Enter date of birth: ");
-        scanf("%s", newStudent.dateOfBirth);
+
+        // Validate and input date of birth until a valid format is entered
+        while (1) {
+            printf("Enter date of birth (dd/mm/yyyy): ");
+            scanf("%s", newStudent.dateOfBirth);
+            if (validateDateOfBirth(newStudent.dateOfBirth)) {
+                break;  // Valid date format
+            } else {
+                printf("Invalid date format or values. Please enter again\n");
+            }
+        }
 
         // add the new student to the array
         studentList[studentCount] = newStudent;
@@ -128,13 +142,48 @@ void addStudent() {
     }
 }
 
-
 void printMajorOptions() {
     printf("Select a major:\n");
     printf("1. KTPM (Ky thuat phan mem)\n");
     printf("2. MS (Marketing so)\n");
     printf("3. NNA (Ngon ngu Anh)\n");
     printf("Enter the number corresponding to the major: ");
+}
+
+int isLeapYear(int year) {
+    if ((year % 4 == 0 && year % 100 != 0) || (year % 400 == 0)) {
+        return 1;  // leap year
+    }
+    return 0;  // not a leap year
+}
+
+int validateDateOfBirth(const char* dateOfBirth) {
+    int day, month, year;
+    if (sscanf(dateOfBirth, "%d/%d/%d", &day, &month, &year) == 3) {
+        if (year >= 1900 && year <= 2100 && month >= 1 && month <= 12) {
+            int maxDay = 31; // Default to maximum days in a month
+            if (month == 4 || month == 6 || month == 9 || month == 11) {
+                maxDay = 30;  // April, June, September, November have 30 days
+            } else if (month == 2) {
+                maxDay = isLeapYear(year) ? 29 : 28;  // February has 28 or 29 days depending on leap year
+            }
+
+            if (day >= 1 && day <= maxDay) {
+                // Check if the entered date is not in the future
+                time_t current_time;
+                struct tm* current_date;
+                time(&current_time);
+                current_date = localtime(&current_time);
+
+                if (year < (current_date->tm_year + 1900) || (year == (current_date->tm_year + 1900) && 
+                   (month < (current_date->tm_mon + 1) || (month == (current_date->tm_mon + 1) && 
+                    day <= current_date->tm_mday)))) {
+                    return 1;  // Valid date format and values
+                }
+            }
+        }
+    }
+    return 0;  // Invalid date format or values
 }
 
 
@@ -229,4 +278,72 @@ void deleteStudent() {
         }
         generateTableTail();
     }
+}
+
+void sortStudent() {
+    if (studentCount == 0) {
+        printf("No students added yet.\n");
+        return;
+    }
+
+    int option;
+    printSortOptions();
+    printf("Enter the number corresponding to the sorting option: ");
+    scanf("%d", &option);
+
+    if (option < 1 || option > 4) {
+        printf("Invalid sorting option.\n");
+        return;
+    }
+
+    // perform sorting based on the selected option
+    int swapped;
+    struct Student temp;
+
+    do {
+        swapped = 0;
+        for (int i = 0; i < studentCount - 1; i++) {
+            int compareResult;
+            switch (option) {
+                case 1:
+                    compareResult = strcmp(studentList[i].name, studentList[i + 1].name);
+                    break;
+                case 2:
+                    compareResult = strcmp(studentList[i].major, studentList[i + 1].major);
+                    break;
+                case 3:
+                    compareResult = strcmp(studentList[i].studentCode, studentList[i + 1].studentCode);
+                    break;
+                case 4:
+                    compareResult = strcmp(studentList[i].dateOfBirth, studentList[i + 1].dateOfBirth);
+                    break;
+                default:
+                    printf("Invalid sorting option.\n");
+                    return;
+            }
+
+            if (compareResult > 0) {
+                temp = studentList[i];
+                studentList[i] = studentList[i + 1];
+                studentList[i + 1] = temp;
+                swapped = 1;
+            }
+        }
+    } while (swapped);
+
+    // print the sorted results
+    printf("Students sorted in ascending order:\n");
+    generateTableHead();
+    for (int i = 0; i < studentCount; i++) {
+        generateTableLine(i + 1, studentList[i].name, studentList[i].major, studentList[i].studentCode, studentList[i].dateOfBirth);
+    }
+    generateTableTail();
+}
+
+void printSortOptions() {
+    printf("Select a sorting option:\n");
+    printf("1. Name\n");
+    printf("2. Major\n");
+    printf("3. Student code\n");
+    printf("4. Date of birth\n");
 }
