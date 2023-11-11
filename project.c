@@ -26,6 +26,7 @@ void generateTableHead();
 void generateTableLine(int id, char *name, char *major, char *studentCode, char *dateOfBirth);
 void generateTableTail();
 void searchStudent();
+void deleteStudent();
 
 int main() {
     do {
@@ -42,7 +43,7 @@ int main() {
                 searchStudent();
                 break;
             case 4:
-                printf("Delete student\n");
+                deleteStudent();
                 break;
             case 5:
                 printf("Sort student\n");
@@ -195,6 +196,37 @@ void searchStudent() {
     if (!found) {
         printf("No matching students found.\n");
     } else {
+        generateTableTail();
+    }
+}
+
+void deleteStudent() {
+    if (studentCount == 0) {
+        printf("No students added yet.\n");
+        return;
+    }
+    generateTableHead();
+    for (int i = 0; i < studentCount; i++) {
+        generateTableLine(i + 1, studentList[i].name, studentList[i].major, studentList[i].studentCode, studentList[i].dateOfBirth);
+    }
+    generateTableTail();
+    int id;
+    printf("Enter the ID of the student to delete: ");
+    scanf("%d", &id);
+    for (int i = id - 1; i < studentCount - 1; i++) {
+        studentList[i] = studentList[i + 1];
+    }
+    studentCount--;
+    printf("Student deleted successfully.\n");
+
+    if (studentCount == 0) {
+        printf("No students added yet.\n");
+        return;
+    } else {
+        generateTableHead();
+        for (int i = 0; i < studentCount; i++) {
+            generateTableLine(i + 1, studentList[i].name, studentList[i].major, studentList[i].studentCode, studentList[i].dateOfBirth);
+        }
         generateTableTail();
     }
 }
