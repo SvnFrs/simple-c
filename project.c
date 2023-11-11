@@ -87,8 +87,6 @@ void addStudent() {
         studentCount++;
 
         printf("Student added successfully!\n");
-        // return to the main menu
-        printMenu();
     } else {
         printf("Maximum number of students reached. Cannot add more students.\n");
     }
