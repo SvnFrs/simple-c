@@ -161,7 +161,7 @@ int validateDateOfBirth(const char* dateOfBirth) {
     int day, month, year;
     if (sscanf(dateOfBirth, "%d/%d/%d", &day, &month, &year) == 3) {
         if (year >= 1900 && year <= 2100 && month >= 1 && month <= 12) {
-            int maxDay = 31; // Default to maximum days in a month
+            int maxDay = 31; // default to maximum days in a month
             if (month == 4 || month == 6 || month == 9 || month == 11) {
                 maxDay = 30;  // April, June, September, November have 30 days
             } else if (month == 2) {
@@ -169,7 +169,8 @@ int validateDateOfBirth(const char* dateOfBirth) {
             }
 
             if (day >= 1 && day <= maxDay) {
-                // Check if the entered date is not in the future
+                // check if the entered date is not in the future
+                // stolen from https://stackoverflow.com/questions/1442116/how-to-get-the-date-and-time-values-in-a-c-program#1442131
                 time_t current_time;
                 struct tm* current_date;
                 time(&current_time);
@@ -178,12 +179,12 @@ int validateDateOfBirth(const char* dateOfBirth) {
                 if (year < (current_date->tm_year + 1900) || (year == (current_date->tm_year + 1900) && 
                    (month < (current_date->tm_mon + 1) || (month == (current_date->tm_mon + 1) && 
                     day <= current_date->tm_mday)))) {
-                    return 1;  // Valid date format and values
+                    return 1;  // valid date format and values
                 }
             }
         }
     }
-    return 0;  // Invalid date format or values
+    return 0;  // invalid date format or values
 }
 
 
