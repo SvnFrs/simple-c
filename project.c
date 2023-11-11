@@ -25,6 +25,7 @@ void displayStudent();
 void generateTableHead();
 void generateTableLine(int id, char *name, char *major, char *studentCode, char *dateOfBirth);
 void generateTableTail();
+void searchStudent();
 
 int main() {
     do {
@@ -38,7 +39,7 @@ int main() {
                 displayStudent();
                 break;
             case 3:
-                printf("Search student\n");
+                searchStudent();
                 break;
             case 4:
                 printf("Delete student\n");
@@ -127,7 +128,6 @@ void addStudent() {
 }
 
 
-
 void printMajorOptions() {
     printf("Select a major:\n");
     printf("1. KTPM (Ky thuat phan mem)\n");
@@ -135,7 +135,6 @@ void printMajorOptions() {
     printf("3. NNA (Ngon ngu Anh)\n");
     printf("Enter the number corresponding to the major: ");
 }
-
 
 
 void displayStudent() {
@@ -168,4 +167,34 @@ void generateTableLine(int id, char *name, char *major, char *studentCode, char 
 
 void generateTableTail() {
     printf("+------+--------------------+----------------+----------------+----------------+\n");
+}
+
+void searchStudent() {
+    if (studentCount == 0) {
+        printf("No students added yet.\n");
+        return;
+    }
+
+    char searchQuery[100];
+    printf("Enter part of the student's name: ");
+    scanf("%s", searchQuery);
+
+    int found = 0;
+
+    for (int i = 0; i < studentCount; i++) {
+        if (strstr(studentList[i].name, searchQuery) != NULL) {
+            if (!found) {
+                printf("Students found:\n");
+                generateTableHead();
+                found = 1;
+            }
+            generateTableLine(i + 1, studentList[i].name, studentList[i].major, studentList[i].studentCode, studentList[i].dateOfBirth);
+        }
+    }
+
+    if (!found) {
+        printf("No matching students found.\n");
+    } else {
+        generateTableTail();
+    }
 }
