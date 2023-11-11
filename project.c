@@ -20,6 +20,7 @@ int input;
 
 void printMenu();
 void addStudent();
+void printMajorOptions();
 void displayStudent();
 
 int main() {
@@ -75,8 +76,39 @@ void addStudent() {
         struct Student newStudent;
         printf("Enter student name: ");
         scanf("%s", newStudent.name);
-        printf("Enter major: ");
-        scanf("%s", newStudent.major);
+
+        int majorChoice;
+
+        while (1) {
+            // display and select major options
+            printMajorOptions();
+
+            // check if scanf successfully reads an integer
+            if (scanf("%d", &majorChoice) != 1) {
+                int c;
+                // clear the input buffer if a non-integer input is detected
+                while ((c = getchar()) != '\n' && c != EOF);
+                printf("Invalid input. Please enter a number (1-3) for the major choice: ");
+            } else if (majorChoice >= 1 && majorChoice <= 3) {
+                // valid major choice
+                break;
+            } else {
+                printf("Invalid major choice. Please try again.\n");
+            }
+        }
+
+        switch (majorChoice) {
+            case 1:
+                strcpy(newStudent.major, "KTPM (Ky thuat phan mem)");
+                break;
+            case 2:
+                strcpy(newStudent.major, "MS (Marketing so)");
+                break;
+            case 3:
+                strcpy(newStudent.major, "NNA (Ngon ngu Anh)");
+                break;
+        }
+
         printf("Enter student code: ");
         scanf("%s", newStudent.studentCode);
         printf("Enter date of birth: ");
@@ -85,12 +117,23 @@ void addStudent() {
         // add the new student to the array
         studentList[studentCount] = newStudent;
         studentCount++;
-
         printf("Student added successfully!\n");
     } else {
         printf("Maximum number of students reached. Cannot add more students.\n");
     }
 }
+
+
+
+void printMajorOptions() {
+    printf("Select a major:\n");
+    printf("1. KTPM (Ky thuat phan mem)\n");
+    printf("2. MS (Marketing so)\n");
+    printf("3. NNA (Ngon ngu Anh)\n");
+    printf("Enter the number corresponding to the major: ");
+}
+
+
 
 void displayStudent() {
     printf("\nList of students:\n");
