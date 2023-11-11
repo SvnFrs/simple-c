@@ -22,6 +22,8 @@ int input;
 void printMenu();
 void addStudent();
 void printMajorOptions();
+int isStudentCodeUnique(const char* studentCode);
+int validateStudentCode(const char* major, const char* studentCode);
 int isLeapYear(int year);
 int validateDateOfBirth(const char* dateOfBirth);
 void displayStudent();
@@ -119,8 +121,16 @@ void addStudent() {
                 break;
         }
 
-        printf("Enter student code: ");
-        scanf("%s", newStudent.studentCode);
+        // Validate and input student code until a valid, unique format is entered
+        while (1) {
+            printf("Enter student code: ");
+            scanf("%s", newStudent.studentCode);
+            if (validateStudentCode(newStudent.major, newStudent.studentCode)) {
+                break;  // Valid and unique student code
+            } else {
+                printf("Invalid or non-unique student code for the chosen major. Please enter a valid and unique student code.\n");
+            }
+        }
 
         // Validate and input date of birth until a valid format is entered
         while (1) {
@@ -129,7 +139,7 @@ void addStudent() {
             if (validateDateOfBirth(newStudent.dateOfBirth)) {
                 break;  // Valid date format
             } else {
-                printf("Invalid date format or values. Please enter again\n");
+                printf("Invalid date format, values, or future date. Please enter the date in 'dd/mm/yyyy' format.\n");
             }
         }
 
@@ -148,6 +158,35 @@ void printMajorOptions() {
     printf("2. MS (Marketing so)\n");
     printf("3. NNA (Ngon ngu Anh)\n");
     printf("Enter the number corresponding to the major: ");
+}
+
+int isStudentCodeUnique(const char* studentCode) {
+    for (int i = 0; i < studentCount; i++) {
+        if (strcmp(studentList[i].studentCode, studentCode) == 0) {
+            return 0;  // student code already exists
+        }
+    }
+    return 1;  // student code is unique
+}
+
+int validateStudentCode(const char* major, const char* studentCode) {
+    if (strcmp(major, "KTPM") == 0) {
+        // major is 'KTPM', so student code should start with 'CE'
+        if (strncmp(studentCode, "CE", 2) == 0 && strlen(studentCode) == 8 && isStudentCodeUnique(studentCode)) {
+            return 1;  // valid and unique student code
+        }
+    } else if (strcmp(major, "MS") == 0) {
+        // major is 'MS', so student code should start with 'BE'
+        if (strncmp(studentCode, "BE", 2) == 0 && strlen(studentCode) == 8 && isStudentCodeUnique(studentCode)) {
+            return 1;  // valid and unique student code
+        }
+    } else if (strcmp(major, "NNA") == 0) {
+        // major is 'NNA', so student code should start with 'LE'
+        if (strncmp(studentCode, "LE", 2) == 0 && strlen(studentCode) == 8 && isStudentCodeUnique(studentCode)) {
+            return 1;  // valid and unique student code
+        }
+    }
+    return 0;  // invalid or non-unique student code for the chosen major
 }
 
 int isLeapYear(int year) {
@@ -297,26 +336,45 @@ void sortStudent() {
         return;
     }
 
-    // perform sorting based on the selected option
+    // Create a temporary list of students for sorting
+    struct Student tempStudentList[MAX_STUDENTS];
+    for (int i = 0; i < studentCount; i++) {
+        tempStudentList[i] = studentList[i];
+    }
+
+    // Perform sorting based on the selected option
     int swapped;
     struct Student temp;
 
     do {
         swapped = 0;
         for (int i = 0; i < studentCount - 1; i++) {
-            int compareResult;
+            int compareResult = 0;
+
             switch (option) {
                 case 1:
-                    compareResult = strcmp(studentList[i].name, studentList[i + 1].name);
+                    compareResult = strcmp(tempStudentList[i].name, tempStudentList[i + 1].name);
                     break;
                 case 2:
-                    compareResult = strcmp(studentList[i].major, studentList[i + 1].major);
+                    compareResult = strcmp(tempStudentList[i].major, tempStudentList[i + 1].major);
                     break;
                 case 3:
-                    compareResult = strcmp(studentList[i].studentCode, studentList[i + 1].studentCode);
+                    compareResult = strcmp(tempStudentList[i].studentCode, tempStudentList[i + 1].studentCode);
                     break;
                 case 4:
-                    compareResult = strcmp(studentList[i].dateOfBirth, studentList[i + 1].dateOfBirth);
+                    // Compare the full date of birth (dd/mm/yyyy)
+                    int day1, month1, year1;
+                    int day2, month2, year2;
+                    sscanf(tempStudentList[i].dateOfBirth, "%d/%d/%d", &day1, &month1, &year1);
+                    sscanf(tempStudentList[i + 1].dateOfBirth, "%d/%d/%d", &day2, &month2, &year2);
+
+                    if (year1 != year2) {
+                        compareResult = year1 - year2;
+                    } else if (month1 != month2) {
+                        compareResult = month1 - month2;
+                    } else {
+                        compareResult = day1 - day2;
+                    }
                     break;
                 default:
                     printf("Invalid sorting option.\n");
@@ -324,22 +382,23 @@ void sortStudent() {
             }
 
             if (compareResult > 0) {
-                temp = studentList[i];
-                studentList[i] = studentList[i + 1];
-                studentList[i + 1] = temp;
+                temp = tempStudentList[i];
+                tempStudentList[i] = tempStudentList[i + 1];
+                tempStudentList[i + 1] = temp;
                 swapped = 1;
             }
         }
     } while (swapped);
 
-    // print the sorted results
+    // Print the sorted results
     printf("Students sorted in ascending order:\n");
     generateTableHead();
     for (int i = 0; i < studentCount; i++) {
-        generateTableLine(i + 1, studentList[i].name, studentList[i].major, studentList[i].studentCode, studentList[i].dateOfBirth);
+        generateTableLine(i + 1, tempStudentList[i].name, tempStudentList[i].major, tempStudentList[i].studentCode, tempStudentList[i].dateOfBirth);
     }
     generateTableTail();
 }
+
 
 void printSortOptions() {
     printf("Select a sorting option:\n");
